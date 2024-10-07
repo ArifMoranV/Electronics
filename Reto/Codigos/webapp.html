@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>DHT Readings</title>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<style type="text/css">
+		body{
+			background-color: #8b7373;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		.data-container{
+			display: flex;
+			justify-content: space-between;
+			width: 80%;
+			margin: 50px auto;
+			padding: 20px;
+			background-color: #b99b9b;
+			box-shadow: 0 2px 20px rgba(0, 0, 0,0.1);
+			border-radius: 10px;
+		}
+
+		.data-item{
+			text-align: center;
+		}
+
+		.data-item h2{
+			font-size: 24px;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+
+		.data-item p{
+			font-size: 30px;
+			font-weight: bold;
+			color: hsl(185, 16%, 85%);
+		}
+
+		.data-head{
+			margin: auto;
+			width: 50%;
+			text-align: center;
+			font-size: 45px;
+			font-weight: bold;
+			margin: 50px auto;
+			padding: 20px;
+			background-color: #e4d4d4;
+			box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+			border-radius: 20px;
+
+
+		}
+
+
+
+	</style>
+</head>
+
+
+<body>
+	<img src=https://www.citicinemas.com/img/logo.svg height='60'>
+
+	<script>
+		var xx = [1,2,3,4];
+		window.xx=xx;
+	</script>
+
+    <div class="data-head">Temperature Sensors Cinema</div>
+
+	<div class="data-container">
+		<div class="data-item">
+			<h2>Temperature S1</h2>
+			<p class="value" id="temperatures1"> 24 &#8451;</p>
+		</div>
+
+		<div class="data-item">
+			<h2>Temperature S2</h2>
+			<p class="value" id="temperatures2"> 37 &#8451;</p>
+		</div> 
+
+		<div class="data-item">
+			<h2>Temperature S3</h2>
+			<p class="value" id="temperatures3"> 58 &#8451;</p>
+		</div>
+
+		<div class="data-item">
+			<h2>Temperature S4</h2>
+			<p class="value" id="temperatures4"> 99 &#8451;</p>
+            
+		</div>
+        
+        <div class="data-item">
+			<h2>Elapsed Time </h2>
+			<p class="value" id="Etime"> 1 </p>
+		</div>
+        
+
+    </div>
+    
+    <div class="data-container">
+          <div class="data-item">
+              <h2>Condensator </h2>
+              <p class="value" id="temperatures5"> 24 &#8451;</p>
+          </div>
+          
+          <div class="data-item">
+            <h2>Evaporator</h2>
+            <p class="value" id="temperatures8"> 37 &#8451;</p>
+        </div> 
+
+          <div class="data-item">
+              <h2>AC opening </h2>
+              <p class="value" id="temperatures6"> 24 &#8451;</p>
+          </div>
+          
+          <div class="data-item">
+              <h2>AC Exit </h2>
+              <p class="value" id="temperatures7"> 24 &#8451;</p>
+          </div>
+
+          
+
+      </div>
+  
+    <div id="myDiv"></div>
+    
+     <div id="myDiv2"></div>
+    
+
+	<div class="data-head">Pressure Sensors of Refrigerant </div>
+    
+    <div class="data-container">
+		<div class="data-item">
+			<h2>AC Condensator Pressure</h2>
+			<p class="value" id="pressure1"> 24 ;</p>
+		</div>
+
+		<div class="data-item">
+			<h2>AC Evaporator pressure</h2>
+			<p class="value" id="pressure2"> 37 ;</p>
+		</div> 
+
+    </div>
+	
+	
+	<div id="myDiv3"></div>
+
+	
+    
+
+    <script type="module">
+		
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase , ref, get , onValue} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsyvcBUhNivDoPiDP55YVx-R2NEE9QBeQ",
+            authDomain: "c-citicinemas.firebaseapp.com",
+            databaseURL: "https://c-citicinemas-default-rtdb.firebaseio.com",
+            projectId: "c-citicinemas",
+            storageBucket: "c-citicinemas.appspot.com",
+            messagingSenderId: "853571736012",
+            appId: "1:853571736012:web:031fa3684d0aa0dcbe4d69",
+            measurementId: "G-ML5W2XYHDS"
+        };
+
+        // Initialize Firebase
+		
+
+        // Initialize Firebase
+	    const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        //getting reference to the data we want
+        //Temperature
+        var dataRef1 = ref(database,'Sensor/Temperature');
+        var dataRef2 = ref(database,'Sensor/Temperature2');
+        var dataRef3 = ref(database,'Sensor/Temperature3');
+        var dataRef4 = ref(database,'Sensor/Temperature4');
+        var dataRef5 = ref(database,'Sensor/Temperature5');
+        var dataRef6 = ref(database,'Sensor/Temperature6');
+        var dataRef7 = ref(database,'Sensor/Temperature7');
+        var dataRef8 = ref(database,'Sensor/Temperature8');
+        
+        //Pressure
+        var dataRef9 = ref(database,'Sensor/Pressure1');
+        var dataRef0 = ref(database,'Sensor/Pressure2');
+        
+        //Time
+        var dataReft = ref(database,'Sensor/Time');
+        
+
+
+		let temperatures1 = [];
+		let temperatures2 = [];
+        let temperatures3 = [];
+		let temperatures4 = [];
+        let temperaturesav =[];
+        let temperatures5 = [];
+		let temperatures6 = [];
+        let temperatures7 = [];
+		let temperatures8 = [];
+        let pressures1=[];
+        let pressures2=[];
+		let ts = [];
+		
+        
+        onValue(dataReft, (snapshot) => {
+        const time = snapshot.val();
+
+        // Fetch values from dataRef1
+          get(dataRef1).then((temp1Snapshot) => {
+              const temp1 = temp1Snapshot.val();
+
+              // Fetch values from dataRef2
+          get(dataRef2).then((temp2Snapshot) => {
+               const temp2 = temp2Snapshot.val();
+
+              // Fetch values from dataRef3
+          get(dataRef3).then((temp3Snapshot) => {
+               const temp3 = temp3Snapshot.val();
+          
+          get(dataRef4).then((temp4Snapshot) => {
+             const temp4 = temp4Snapshot.val();
+          
+          get(dataRef5).then((temp5Snapshot) => {
+               const temp5 = temp5Snapshot.val();
+          
+          get(dataRef6).then((temp6Snapshot) => {
+               const temp6 = temp6Snapshot.val();
+          
+          get(dataRef7).then((temp7Snapshot) => {
+               const temp7 = temp7Snapshot.val();
+          
+          get(dataRef8).then((temp8Snapshot) => {
+               const temp8 = temp8Snapshot.val();
+               
+          get(dataRef9).then((temp9Snapshot) => {
+               const pres1 = temp9Snapshot.val();
+          
+          get(dataRef0).then((temp0Snapshot) => {
+               const pres2 = temp0Snapshot.val();
+          
+		
+          
+             
+        
+             
+                // Update HTML elements
+                document.getElementById('Etime').innerHTML = Math.round(time*10)/10 +'(s)';
+                document.getElementById('temperatures1').innerHTML = Math.round(temp1*100)/100 + "&#8451;";
+                document.getElementById('temperatures2').innerHTML = Math.round(temp2*100)/100 + "&#8451;";
+                document.getElementById('temperatures3').innerHTML = Math.round(temp3*100)/100 + "&#8451;";
+                document.getElementById('temperatures4').innerHTML = Math.round(temp4*100)/100 + "&#8451;";
+                document.getElementById('temperatures5').innerHTML = temp5 + "&#8451;";
+                document.getElementById('temperatures6').innerHTML = temp6 + "&#8451;";
+                document.getElementById('temperatures7').innerHTML = temp7 + "&#8451;";
+                document.getElementById('temperatures8').innerHTML = temp8 + "&#8451;";
+ 
+                document.getElementById('pressure1').innerHTML = pres1 + "psi";
+                document.getElementById('pressure2').innerHTML = pres2 + "psi";
+                
+
+                // Update arrays and plot
+                ts.push(time);
+                temperatures1.push(temp1);
+                temperatures2.push(temp2);
+                temperatures3.push(temp3);
+                temperatures4.push(temp4);
+                temperaturesav.push((temp1+temp2+temp3+temp4)/4)
+                
+                
+               	temperatures5.push(temp5);
+                temperatures6.push(temp6);
+                temperatures7.push(temp7);
+                temperatures8.push(temp8);
+                
+                pressures1.push(pres1)
+                pressures2.push(pres2)
+                
+                updatePlotly(ts, temperatures1,temperatures2,temperatures3,temperatures4,temperatures5,temperatures6,temperatures7,temperatures8,temperaturesav,pressures1,pressures2);
+                							});
+                						});
+                					});
+                				});
+                			});	
+                  		});
+                	});
+                });
+            });
+        });
+    });
+
+        
+        
+		
+		
+
+
+		//export const xx; // Export xx at the end
+
+		//return xx;
+    </script>
+
+	
+	<script>var pp= 23*3 ;
+		//console.log(myVariable);
+	</script>
+		
+	<script>var xData=[1,2,3,0,5];
+
+		</script>
+
+	<script>
+	
+
+    var layout = {
+        title: 'Average Temperature In Cinema vs time(s)',
+        //plot_bgcolor: "rgba(0,0,0,0)",
+        //paper_bgcolor: "rgba(0,0,0,0)",
+        yaxis: {
+            title: {
+            text: 'Temperature'+"&#8451;",
+            },
+            range: [15, 45],
+        },
+        xaxis: {
+            title: {
+            text: 'Time(s)',
+            },
+        },
+    };
+    
+    var layout2 = {
+        title: 'AC Temperature vs time(s)',
+        yaxis: {
+            title: {
+            text: 'Temperature'+"&#8451;",
+            },
+            range: [0, 50],
+        },
+        xaxis: {
+            title: {
+            text: 'Time(s)',
+            },
+        },
+    };
+    
+    var layoutp = {
+        title: 'Pressure in Refrigerant vs time(s)',
+        yaxis: {
+            title: {
+            text: 'Pressure psi',
+            },
+            range: [0, 370],
+        },
+        xaxis: {
+            title: {
+            text: 'Time(s)',
+            },
+        },
+    };
+
+    //Plotly.newPlot('myDiv', [data1,data2], layout);
+
+    // Update the chart dynamically when needed:
+    function updatePlotly(datax, T1,T2,T3,T4,T5,T6,T7,T8, TA,P1,P2) {
+    	var y1 = {
+        	x:datax,
+            y: T1,  // Initial data for the first plot
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#17BECF' },
+            name: 'S1',
+        };
+        
+        var y2 = {
+        	x:datax,
+            y: T2,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#FF5733' },  // Choose a different color for the second plot
+            name: 'S2',
+        };
+        
+        var y3 = {
+        	x:datax,
+            y: T3,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            //line: { color: '#FF5733' },  // Choose a different color for the second plot
+            name: 'S3',
+        };
+        
+        var y4 = {
+        	x:datax,
+            y: T4,  // Initial data for the first plot
+            type: 'scatter',
+            mode: 'lines',
+            //line: { color: '#17BECF' },
+            name: 'S4',
+        };
+        
+        var Av = {
+        	x:datax,
+            y: TA,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: 'Black' },  // Choose a different color for the second plot
+            name: 'Average Temperature',
+        };
+        
+        var y5 = {
+        	x:datax,
+            y: T5,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            //line: { color: '#FF5733' },  // Choose a different color for the second plot
+            name: 'Condensator',
+        };
+        
+        var y6 = {
+        	x:datax,
+            y: T6,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            //line: { color: '#FF5733' },  // Choose a different color for the second plot
+            name: 'AC air entrance',
+        };
+        
+        var y7 = {
+        	x: datax,
+            y: T7,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+           //line: { color: 'Black' },  // Choose a different color for the second plot
+            name: 'AC air exit',
+        };
+       
+        
+        var y8 = {
+        	x:datax,
+            y: T8,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+           // line: { color: 'Black' },  // Choose a different color for the second plot
+            name: 'Evaporator',
+        };
+        
+        var z1 = {
+        	x:datax,
+            y: P1,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: 'Black' },  // Choose a different color for the second plot
+            name: 'P1 psi',
+        };
+        
+        var z2 = {
+        	x: datax,
+            y: P2,  // Add your second set of y data here
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: 'red' },  // Choose a different color for the second plot
+            name: 'P2 psi',
+        };
+        
+        
+        
+        
+        Plotly.newPlot('myDiv', [y1,y2,y3,y4,Av], layout);
+        Plotly.newPlot('myDiv2', [y6,y7,y5,y8], layout2);
+        Plotly.newPlot('myDiv3', [z1,z2], layoutp);
+        
+    
+        //Plotly.update('myDiv', [data3,data4]); 
+    };
+
+		// Call updateChart when necessary, such as after receiving new data
+	</script>
+
+	
+</body>
+</html>
